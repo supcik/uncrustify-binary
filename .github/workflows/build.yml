@@ -1,0 +1,45 @@
+name: Build binary
+
+on: [push]
+jobs:
+  build:
+    strategy:
+      matrix:
+        version: [0.72.0]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - run: git checkout uncrustify-${{ matrix.version }}
+        working-directory: ./uncrustify
+      - name: Build x86_64
+        working-directory: ./uncrustify
+        run: |
+          mkdir build-x86_64
+          cd build-x86_64
+          cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_BUILD_TYPE=Release ..
+          make
+      - name: Build arm64
+        working-directory: ./uncrustify
+        run: |
+          mkdir build-arm64
+          cd build-arm64
+          cmake -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_BUILD_TYPE=Release ..
+          make
+      - name: Create universal binary
+        run: >
+          lipo -create 
+            ncrustify/build-x86_64/uncrustify
+            uncrustify/build-arm64/uncrustify 
+            -output uncrustify-macos-universal-${{ matrix.version }}
+      - name: copy binaries
+        run: |
+          cp uncrustify/build-arm64/uncrustify uncrustify-macos-arm64-${{ matrix.version }}
+          cp uncrustify/build-x86_64/uncrustify uncrustify-macos-x86_64-${{ matrix.version }}
+      - name: save artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: uncrustify-macos-${{ matrix.version }}
+          path: uncrustify-macos-*
