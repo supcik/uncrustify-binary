@@ -13,8 +13,6 @@ jobs:
         with:
           submodules: 'true'
           fetch-depth: 0
-      - run: git tag
-        working-directory: ./uncrustify
       - run: git checkout uncrustify-${{ matrix.version }}
         working-directory: ./uncrustify
       - name: Build x86_64
@@ -34,9 +32,9 @@ jobs:
       - name: Create universal binary
         run: >
           lipo -create 
-            ncrustify/build-x86_64/uncrustify
-            uncrustify/build-arm64/uncrustify 
-            -output uncrustify-macos-universal-${{ matrix.version }}
+          ncrustify/build-x86_64/uncrustify
+          uncrustify/build-arm64/uncrustify 
+          -output uncrustify-macos-universal-${{ matrix.version }}
       - name: copy binaries
         run: |
           cp uncrustify/build-arm64/uncrustify uncrustify-macos-arm64-${{ matrix.version }}
