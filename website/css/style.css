@@ -1,0 +1,13 @@
+@import url(chota.css);
+
+:root {
+  --color-primary: #007CB7; /* brand color */
+}
+
+body.dark {
+    --bg-color: #000;
+    --bg-secondary-color: #131316;
+    --font-color: #f5f5f5;
+    --color-grey: #ccc;
+    --color-darkGrey: #777;
+}

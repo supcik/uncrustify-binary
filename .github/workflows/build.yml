@@ -1,11 +1,12 @@
 name: Build binary
 
 on: [push]
+
+env:
+  UNC_VERSION: 0.72.0
+
 jobs:
   build:
-    strategy:
-      matrix:
-        version: [0.72.0]
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -13,7 +14,7 @@ jobs:
         with:
           submodules: 'true'
           fetch-depth: 0
-      - run: git checkout uncrustify-${{ matrix.version }}
+      - run: git checkout uncrustify-$UNC_VERSION
         working-directory: ./uncrustify
       - name: Build x86_64
         working-directory: ./uncrustify
@@ -34,13 +35,45 @@ jobs:
           lipo -create 
           uncrustify/build-x86_64/uncrustify
           uncrustify/build-arm64/uncrustify 
-          -output uncrustify-macos-universal-${{ matrix.version }}
+          -output uncrustify-macos-universal-$UNC_VERSION
       - name: copy binaries
         run: |
-          cp uncrustify/build-arm64/uncrustify uncrustify-macos-arm64-${{ matrix.version }}
-          cp uncrustify/build-x86_64/uncrustify uncrustify-macos-x86_64-${{ matrix.version }}
+          cp uncrustify/build-arm64/uncrustify uncrustify-macos-arm64-$UNC_VERSION
+          cp uncrustify/build-x86_64/uncrustify uncrustify-macos-x86_64-$UNC_VERSION
       - name: save artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: uncrustify-macos-${{ matrix.version }}
+          name: uncrustify-macos-$UNC_VERSION
           path: uncrustify-macos-*
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Retrieve binaries
+        uses: actions/download-artifact@v3
+        with:
+          name: uncrustify-macos-$UNC_VERSION
+          path: website/binaries
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: install jinja2
+        run: pip install jinja2
+      - name: build
+        run: python build.py $UNC_VERSION
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: 'website'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

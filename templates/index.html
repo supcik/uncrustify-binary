@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uncrustify {{ version }} MacOS Binaries</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <div id="top" class="container" role="document">
+        <header role="banner">
+            <h1>Uncrustify{{ version }} MacOS Binaries</h1>
+        </header>
+    </div>
+    <div class="container" role="main">
+        <h2>Download</h2>
+        <ul>
+            {%- for file in files %}
+            <li><a href="{{ file.path }}">{{ file.name }}</a></li>
+            {%- endfor %}
+        </ul>
+        <hr />
+        <small>
+            <p>
+                I made this website because I couldn't find any MacOS binaries for the version {{ version }} of
+                Uncrustify.
+                This particular version is required by the pre-commit rules of <a
+                    href="https://micropython.org/">Micropython</a> and <a
+                    href="https://circuitpython.org/">CircuitPython</a>.
+            </p>
+            <p>
+                You must always handle downloadable executable with care and check them for malware.
+                These binaries are build by Github Actions and you can see all building steps in the
+                <a href="https://github.com/supcik/uncrustify-binary">Github repository</a>.
+                Note that these binaries are provided "as is" and I am not responsible for any damage they may cause.
+            </p>
+        </small>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
