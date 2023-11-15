@@ -2,6 +2,15 @@ name: Build binary
 
 on: [push]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
 env:
   UNC_VERSION: 0.72.0
 
